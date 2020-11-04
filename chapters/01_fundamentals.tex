@@ -1,0 +1,128 @@
+\chapter{Fundamentals}
+\section{Motivation and Introduction}
+The number of catalogued vulnerabilities is rising rapidly over time, ever since
+IT existed. Security is all over the headlines both in dedicated news agencies
+and in mainstream media. Ransomware attacks are popular recently and have highly
+visible and critical targets such as hospitals and large companies. Running a
+networked computer system with 100\% security is neither feasible nor possible.
+But strong security is still achievable, and defending most attackers is
+possible.
+
+\section{Terminology}
+When talking about ``secure'' systems, what is usually desired is a
+``dependability'', meaning a system that shows no unexpected or unacceptable
+behavior. A dependable system should fulfill multiple goals, including
+\begin{itemize}
+    \item Availability
+    \item Reliability
+    \item Safety
+    \item Integrity
+    \item Maintainability
+    \item (Confidentiality)
+\end{itemize}
+
+The three major security goals are Confidentiality, Integrity and Availability
+(\emph{CIA}). The main difference between dependability and security is that the
+security is usually assessed from the viewpoint of a potential attack, while
+dependability is considered in a more general context. Security can be seen as a
+precondition of having a dependable system. A secure system is a system that can
+achieve the three mentioned goals even facing an attacker.
+
+\begin{description}[align=right,labelwidth=3cm]
+    \item[Confidentiality] Protection of information against unauthorized access
+    \item[Integrity] Protection against unauthorized change and destruction
+    \item[Availability] Protection against rendering IT resources inaccessible
+\end{description}
+
+A \emph{threat} is defined by a potential error in the system, which could
+enable an attacker to violate those objectives. A \emph{vulnerability} is a
+concrete fault in the system that threaten one or more security objective. A
+threat would be for example the possibility of a DDOS attack towards a web
+service, a lack of resources to cope with the attack is a vulnerability. If an
+attacker exploits the vulnerability, this is called an \emph{attack}.
+
+The concepts of safety and security shall be differentiated.
+
+When analyzing a system with regards to it security, two factors are considered:
+The first is \emph{threat potential}, which estimates the likelihood of each
+potential attack against the system. The second is the \emph{damage potential},
+which asks what the impact to the system would be if an attack succeeds. Likely
+high-impact attack scenarios can be mitigated by either reducing the impact of a
+successful impact or by taking security measures reducing the likelihood of a
+successful attack.
+
+A few more useful definitions:
+\begin{description}[align=right,labelwidth=3cm]
+    \item[Identification] Assignment of an identifier
+    \item[Authentication] Verification of an identity
+    \item[Authorization] Assignment of permissions
+    \item[Access Control] Protection of resources against unauthorized access
+    \item[Privacy] Protecting personal information
+\end{description}
+
+\section{Attacks and Defenses}
+\subsection{Attacks}
+Attack can be categorized by many measures, like intention, approach or point of
+attack.
+
+Categories by intention can be:
+\begin{description}
+    \item[Denial of Service ]Making an IT system unabailable to users
+    \item[Information Theft] Access to confidential information by unauthorized
+          persons
+    \item[Intrusion] Bypassing access control to gain access to a system
+    \item[Tampering] Modification of stored or transmitted data
+\end{description}
+
+By approach:
+\begin{itemize}
+    \item Masquerading
+    \item Eavesdropping
+    \item Authorization Violation
+    \item Loss/Modification
+    \item Denial/Repudiation
+    \item Forgery
+    \item Sabotage
+\end{itemize}
+
+By point of attack:
+\begin{itemize}
+    \item Network
+    \item Network services
+    \item Operating system/Applications
+    \item User
+\end{itemize}
+
+Another possible method of categorization is ``STRIDE'' categorization, which
+stands for Spoofing, Tampering, Repudiation, Information disclosure, Denial of
+Service and Elevation of privilege.
+
+An attack often follows similar patterns. The first step is collecting
+information of the system. This may expose a possible attack vector to the
+attacker, which can then be used/tested. This is often repeated, as the first
+attack is not necessarily successful. After a successful intrusion the next step
+is often privilege escalation. This may allow the attacker to cover their
+tracks, install back doors, etc. If the main goal of the attack is not reached
+yet, this point may be used as the starting point for the next attack, towards
+the initial goal.
+
+Understanding and talking about attacks is vital when dealing with security, as
+this is the very point we are trying to defend against.
+
+\subsection{Security Mechanisms and Policies}
+A Policy is a statement of what is, and what is not allowed. This allows the
+distinction into ``authorized'' and ``unauthorized'' that we made already.
+
+A Security mechanism is a method, tool or procedure that attempts to enforce
+such policies. We can categorize those measures into prevention, detection and
+recovery. It is possible to employ multiple measures, for example a gate as a
+way of prevention, and a camera pointed at the gate which provides detection of
+a successful attack.
+
+\emph{Security through obscurity} or prohibiting reverse engineering and
+attacking is not an alternative to real security.
+
+Security mechanisms can never be judged by themselves. During risk assessment,
+it is always necessary to evaluate the measures in the context in which they are
+employed. The security of a system is determined by the weakest link in the
+chain.
