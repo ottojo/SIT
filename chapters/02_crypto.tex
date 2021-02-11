@@ -1,0 +1,71 @@
+\chapter{Cryptography}
+\section{Cryptographic Hash Functions and Random Numbers}
+\subsection{Hash Functions}
+A hash function is defined as a function $h: D \mapsto S$ with $|D| > |S|$. A
+hash function is expected to fulfill more desired properties:
+\begin{itemize}
+    \item Compression: $|D| \gg |S|$
+    \item Chaotic: Maximal change of the hash with minimal change in input
+    \item Surjective: |S| is fully used
+    \item Efficient calculation
+\end{itemize}
+Even with those properties, a hash function is not considered a cryptographic
+hash function. Even a CRC fulfills those properties. The additional properties
+of a \emph{cryptographic} hash functions are:
+
+\paragraph{One way function:} Also called \emph{first pre-image resistance},
+    this implies that given a hash, an input producing that hash can not be
+    computed efficiently.
+
+\paragraph{Weak collision resistance:} Also called \emph{second pre-image
+    resistance}, implies that given a hash $h = \hash(m)$, an input $m' \neq m$
+    with $\hash(m') = h$ can not be efficiently found.
+
+\paragraph{(Strong) collision resistance:} No $m$ and $m' \neq m$ can be found
+    efficiently with $\hash(m) \neq \hash(m')$. In contrast to weak collision
+    resistance, a specific hash value is not required here.
+
+Hash functions can be used in combination with a key in the form of
+\emph{Message Integrity Code} and \emph{Message Authentication Code} to provide
+an equivalent to digital signatures using symmetric cryptography. The hash based
+MAC \emph{HMAC} is calculated as a hash over a combination of the message with a
+key.
+
+\subsection{Random Number Generators}
+Pseudo-Random Number Generators \emph{PRNG}s which produce a deterministic
+sequence of numbers from an initial seed are not suitable for cryptographic
+applications such as key generation due to their predictability.
+Non-Deterministic RNGs exist and often rely on external physical processes like
+noise in electronic circuits. They do however often have a low data rate which
+is not sufficient for all applications. A combination of a PRNG which is
+(periodically) seeded by a true, non-deterministic RNG is an approach used in
+practice.
+
+Criteria for good RNGs are:
+\begin{itemize}
+    \item Statistical distribution as desired
+    \item Independence: No repeating sequences, invariant to environmental
+          conditions
+    \item Speed of generation
+    \item Long periodicity (PRNGs) / Non-reproducibility
+\end{itemize}
+
+
+\section{Encryption}
+One important distinction between encryption schemes is the concept of symmetric
+and asymmetric ciphers. Symmetric encryption is also called secret key
+cryptography and relies on the presence of a secret key at both endpoints of the
+communication. Asymmetric or public key encryption separates the key into a
+public and private key for both parties. Information about the secret key is
+never shared, and it can be used to decrypt messages which are encrypted using
+the corresponding public key.
+
+The algorithm itself is never considered secret, the security shall only depend
+on the secret keys (Kerckhoffs principle).
+
+Additional actors in a encryption scheme that are to be considered are the
+passive (eavesdropping) attacker (\textit{Eve}), the active (man-in-the-middle)
+attacker (\textit{Mallory}) and a trusted third party (\textit{Trent}).
+
+\subsection{Symmetric Encryption}
+
