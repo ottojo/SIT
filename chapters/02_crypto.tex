@@ -68,4 +68,70 @@ passive (eavesdropping) attacker (\textit{Eve}), the active (man-in-the-middle)
 attacker (\textit{Mallory}) and a trusted third party (\textit{Trent}).
 
 \subsection{Symmetric Encryption}
+Symmetrical encryption approaches usually follow the pattern of using basic
+bitwise operations to form building blocks such as Feistel networks which are
+then combined or repeated in multiple rounds. A challenge arises when the input
+of the cipher is of variable length. Stream ciphers are suited to such a
+problem, but the more common approach is to divide the input into blocks and use
+a block cipher, operating with a fixed input size, multiple time. Simply
+applying the same cipher with the same key to each block (\textit{electronic
+code book}) however is not a good approach since repeated blocks in the input
+will be directly reflected in the ciphertext. Alternatives include integrating
+the previous ciphertext into the next block or including a counter in each
+block, to avoid repeating inputs to the cipher altogether.
 
+A standard block cipher used today is the \textit{Advanced Encryption Standard}
+\emph{AES}, a block cipher with variants for different key lengths such as 128,
+192 or 256 bit.
+
+\subsection{Asymmetric Encryption}
+
+Asymmetric encryption makes encryption possible even without a previously agreed
+on private key.
+
+\subsection{Diffie-Hellman Key Exchange}
+The goal of the DIffie-Hellman key exchange algorithm is to establish a private
+key between two users Alice and Bob, without compromising the secret key to an
+attacker that has full visibility of the entire communication between Alice and
+Bob.
+
+\begin{algorithm}
+    \SetAlgoLined
+    
+    \KwResult{private key $k$}
+    choose public modulus $p$ (prime)\;
+    choose public base $g$ (primitive root modulo $p$)\;
+    \Begin(Alice){
+        choose secret $a$\;
+        $A = g^a \mod p$\;
+        publish $A$;
+    }
+    \Begin(Bob){
+        choose secret $b$\;
+        $A = g^b \mod p$\;
+        publish $B$\;
+        $k = A^b \mod p$\;
+    }
+    \Begin(Alice){
+        $k = B^a  \mod p$\;
+    }
+    \caption{Diffie-Hellman Key Exchange}
+\end{algorithm}
+
+This results in the same private key $k$ for both Alice and Bob. Generating this
+private key requires knowledge of one of the secrets $a$ or $b$, which are only
+known to the corresponding party.
+
+Diffie-Hellman itself is not secure against \emph{Man-in-the-Middle Attacks}. If
+an attacker \textit{Mallory} intercepts the communication, they could perform a
+separate key exchange with both Alice and Bob. They would both have a shared key
+with Mallory, unaware that the real communication partner is not Alice or Bob.
+Mallory can then decrypt incoming messages, read or modify them, and re-encrypt
+them using the second key.
+
+\subsection{RSA}
+RSA is an encryption scheme which allows encrypted communication without first
+establishing a symmetric secret key (using Diffie-Hellman for example). Each
+participant calculates both a public key and a secret key. The public key can be
+used by any participant to encrypt messages, which can only be decoded using the
+corresponding secret key, which is only known to the owner of the key.
