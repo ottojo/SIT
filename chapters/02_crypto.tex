@@ -135,3 +135,31 @@ establishing a symmetric secret key (using Diffie-Hellman for example). Each
 participant calculates both a public key and a secret key. The public key can be
 used by any participant to encrypt messages, which can only be decoded using the
 corresponding secret key, which is only known to the owner of the key.
+
+\subsection{Digital Signatures}
+If the integrity of a document and identity of the author are of concern, but
+the contents are not necessarily encrypted, digital signatures are used. In
+digital signatures, the signature is generated for a specific message (usually a
+hash of the document) with the private key of the author. The verification of
+the signature is possible using the corresponding public key and again the
+message. This is similar to the reverse of the public key encryption scheme.
+
+\subsection{Strength of Cryptographic Approaches}
+The security of cryptographic algorithms can be categorized in the following
+categories:
+
+\begin{itemize}
+    \item \textbf{Empirically secure:} The approach is secure because no attacks
+    against it have been successful, and analysis has not found a specific
+    weakness
+    \item \textbf{(Formally) proven secure:} The encryption is proven to be a
+    mathematically hard problem
+    \item \textbf{Unconditionally secure:} ``An attacker cannot extract any
+    information from the encrypted text''
+\end{itemize}
+
+The only unconditionally secure approach is the \emph{one-time pad}, where the
+key and message have the same length and a unique, random key is used for every
+transmission. Since the key has no inherent correlation, the probability of
+recovering any arbitrary plaintext is identical, which makes even brute force
+attacks impossible.
