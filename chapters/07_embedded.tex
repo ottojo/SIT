@@ -1,0 +1,44 @@
+\chapter{Embedded and Hardware Security}
+
+Security in embedded systems is of special concern. Embedded systems are often
+harder to patch, and often have direct real-world impact, sometimes in a safety
+critical way. Non-mainstream operating systems are in use, and the CPU might not
+offer all desired security features (see below). This results in a large attack
+surface on a system that is not as well understood security-wise as desktop- or
+server applications.
+
+In the following, security will be considered from a lower level than before,
+down to the hardware. Many of the security measures considered before can be
+circumvented if lower-level access is present. Access control on a file system
+for example is worthless if the attacker can connect the disk to another system
+and dump all the contents. Software security is difficult if it relies on
+libraries that can be exchanged by an attacker.
+
+Placing security mechanisms at the lowest possible layer circumvents those
+attacks.
+
+\section{Introduction and x86 Privilege Levels}
+At any point while an x86 processor is executing instructions, it is in some
+\emph{privilege level} or \emph{protection ring}, usually indicated by a number
+where higher numbers represent less privileged execution. Switching to a lower
+privilege level must be protected, while switching to a higher level (less
+privileges) is usually easy. One important feature made possible by this is
+protection of memory segments. Each memory segment contains a Descriptor
+Privilege Level \textit{DPL}, and each process is assigned a privilege level. If
+the Current Privilege Level \textit{CPL} > \textit{DPL}, the CPU generates a
+protection fault and prevents access to memory accessible only to lower
+privilege levels. This for example prohibits applications from modifying
+operating system data structures.
+
+Upgrading of the privilege level (setting it to a lower value) may happen for
+example when a syscall is initiated and execution is passed to the operating
+system. This provides a well defined ``gate'' to those privilege levels.
+
+In order to prevent an application to misuse the privilege level of the syscall,
+by for example instructing it to copy data into the process that the application
+would otherwise not have access to, an additional \textit{Requested Privilege
+Level} may be introduced (\emph{confused deputy problem}).
+
+
+\section{Isolation and HW-based Attacks}
+\section{HW-based Security Mechanisms}
