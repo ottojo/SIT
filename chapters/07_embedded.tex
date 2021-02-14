@@ -20,15 +20,24 @@ attacks.
 \section{Introduction and x86 Privilege Levels}
 At any point while an x86 processor is executing instructions, it is in some
 \emph{privilege level} or \emph{protection ring}, usually indicated by a number
-where higher numbers represent less privileged execution. Switching to a lower
-privilege level must be protected, while switching to a higher level (less
-privileges) is usually easy. One important feature made possible by this is
-protection of memory segments. Each memory segment contains a Descriptor
-Privilege Level \textit{DPL}, and each process is assigned a privilege level. If
-the Current Privilege Level \textit{CPL} > \textit{DPL}, the CPU generates a
-protection fault and prevents access to memory accessible only to lower
-privilege levels. This for example prohibits applications from modifying
-operating system data structures.
+where higher numbers represent less privileged execution:
+
+\begin{itemize}
+    \item[(-1)] Virtual Machine Monitor, Hypervisor
+    \item[0] Operating system kernel
+    \item[1] Rest of the operating system
+    \item[3] I/O Drivers etc.
+    \item[4] Application software
+\end{itemize}
+
+Switching to a lower privilege level must be protected, while switching to a
+higher level (less privileges) is usually easy. One important feature made
+possible by this is protection of memory segments. Each memory segment contains
+a Descriptor Privilege Level \textit{DPL}, and each process is assigned a
+privilege level. If the Current Privilege Level \textit{CPL} > \textit{DPL}, the
+CPU generates a protection fault and prevents access to memory accessible only
+to lower privilege levels. This for example prohibits applications from
+modifying operating system data structures.
 
 Upgrading of the privilege level (setting it to a lower value) may happen for
 example when a syscall is initiated and execution is passed to the operating
@@ -39,6 +48,23 @@ by for example instructing it to copy data into the process that the application
 would otherwise not have access to, an additional \textit{Requested Privilege
 Level} may be introduced (\emph{confused deputy problem}).
 
-
 \section{Isolation and HW-based Attacks}
+The privilege levels introduced above provide a means of isolation between the
+operating and user programs, often called \textit{userspace} and
+\textit{kernelspace}. Isolation is often advantageous to security as it provides
+a barrier with defined interfaces between components. A ubiquitous form of
+isolation is that between multiple processes on a single computer. Address
+space, access rights and file descriptors are completely separate for multiple
+processes. Special security-critical functions such as handling of private keys
+may even be delegated to a dedicated hardware security module.
+
+Attacks which circumvent those measures and leak data through channels other
+than the predefined interfaces are called \emph{side-channel attacks}: Such
+side-channels may be for example power consumption or electromagnetic emission
+of a device. Countless such side-channels have been found, with varying degree
+of real-world usage. Most mitigations against such attacks have been broken by
+even cleverer side-channel attacks. Recent examples of side-channel attacks
+exploit interference between adjacent DRAM cells in main memory or cachelines
+that don't get evicted after branch prediction has failed.
+
 \section{HW-based Security Mechanisms}
