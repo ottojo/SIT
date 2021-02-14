@@ -138,5 +138,23 @@ In attacks on passwords a trade-off between time and memory has to be made, the
 two extremes being the brute-force attack and the fully pre-calculated
 dictionary/codebook attack.
 
+One possible solution is a \emph{Variable Length Lookup Table}. Those rely on
+hash chains: For many initial values, a chain of hashes (length $n_\text{max}$)
+each is calculated. Only the initial and end-value are for each chain is then
+stored. When a certain hash shall then be cracked, it will be hashed
+$n_\text{max}$ times until a chain is found which end-state matches the
+calculated hash. Once the chain is found, it can be restored using the stored
+initial state which results in a chain containing the to-be-cracked hash and the
+password as the state immediately preceding that value.
+
+An improvement to lookup time can be made by making the chains variable length,
+and introducing an end criterion, for example a certain number of zero-bits at
+the end of the hash (\emph{Distinguished Codepoints}). This reduces the number
+of end-lookups significantly.
+
+Duplication arising from hash collisions are addressed by \emph{Rainbow Tables}:
+A round-specific reduction function (hash space \textrightarrow password space)
+is introduced. So even if a state is already present in a different chain (but
+at another round in the chain), the original chain continues separately.
 
 \section{Network Authentication}
