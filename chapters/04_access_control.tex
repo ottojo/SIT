@@ -125,3 +125,14 @@ A state is secure, if the following properties are met:
     \item \emph{Discretionary Security Property}: For all $(s,o,a) \in b$: $A
               \in M_{s,o}$
 \end{itemize}
+
+\section{POSIX Capabilities}
+POSIX capabilities are an implementation of a capability based access control
+scheme. An example would be the right to open raw sockets on linux, which is
+usually reserved to the root user. This is however necessary for the
+\texttt{ping} utility, which should be accessible to every user, even without
+setting the \texttt{setuid} bit on the binary. The POSIX capability system now
+allows giving the specific right to open raw sockets to the specific binary.
+This also adheres to the principle of least privilege a lot better than always
+executing \texttt{ping} with full root rights. Capabilities are also not
+reserved to files, but can be given to individual processes as well.
