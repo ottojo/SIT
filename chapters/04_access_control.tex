@@ -1,0 +1,127 @@
+\chapter{Access Control}
+Access control combines authentication and authorization.
+\Cref{chapter:authentication} showed how the identity of a subject can be
+confirmed, the question is now whether the subject is \emph{authorized} to
+access a specific resource. This decision is generally performed by a
+\emph{reference monitor}, on the basis of some \emph{access policy}, which may
+be set by an administrator or the owner of the object.To differentiate the terms
+\textit{subject} and \textit{object}:
+
+A \emph{subject} is the \textit{acting entity}, which intends to carry out an
+operation requiring access. Examples include persons, processes or network
+nodes. A subject can also be the object of an access operation at another time.
+
+An \emph{object} is the unit that is \textit{being accessed}. Examples include
+files and directories, database records, computers, processes, mailboxes or
+applications.
+
+The \emph{access operation} is the type of operation of a subject in relation to
+an object. Different sets of access operations can be defined. A file system
+might for example define \textit{read} and \textit{write} operations (or
+\textit{observe} and \textit{alter}). There might be additional operation like
+\textit{execute} or \textit{append}, which can be handled independently.
+
+\section{Access Control Matrix}
+The access policy can be described using an \textit{access control matrix}. The
+matrix contains the set of every allowed operation for every possible pair of
+subject and object. This however immediately presents a problem, as this
+approach scales badly. For $N$ subjects (users) and $M$ objects (files), a $N
+\times M$ matrix would have to be stored.
+
+Two implementations of the access control matrix may be more appropriate
+depending on the application:
+
+\subsection{Access Control List}
+In an Access Control List (\textit{ACL}), a list of subject-operation pairs is
+stored with each object. A file might for example contain a list of all users
+that have access to that file, and which exact operations they are allowed to
+execute on the file. If a user is not allowed to interact with the file in any
+way, the entry may be omitted.
+
+\subsection{Capabilities}
+In direct contrast to the ACL, in a capabilities based system the subjects
+contain a list of objects and the corresponding operations which the subject is
+authorized to execute on the object. In the file system example, each user would
+contain a list of files which the user is allowed to access.
+
+\section{Models for Access Control}
+More detailed access control models are in use:
+\begin{itemize}
+    \item[DAC] \emph{Discretionary Access Control} is the approach as explained
+          above. Access control decisions are based on a subject and object.
+          Subjects define the access rights of an object (file owner for
+          example).
+    \item[MAC] \emph{Mandatory Access Control} is oriented towards clearance
+          levels, as one might expect in a government or military setting. The
+          access rights are usually defined system-wide, and are not changed by
+          a subject. More information on this in \cref{sec:belllapadula}.
+    \item[RBAC] In \emph{Role Based Access Control} access to objects is not
+          defined per subject, but per \textit{role}. Roles are given to
+          subjects, and may change.
+    \item[ABAC] \emph{Attribute Based Access Control} is even more abstract,
+          where both subjects and objects have attributes, and access control
+          decisions are made by flexible comparison of attributes.
+\end{itemize}
+
+Real world systems often implement aspects of multiple of those models, and no
+model is the best or definitive answer to access control.
+
+\section{Example: Linux}
+\todo[inline]{Linux access control, ACLs}
+
+\section{Multilevel Security, Bell-Lapadula-Model}
+\label{sec:belllapadula}
+In multilevel security, both objects and subjects are classified. Classes may
+for example be \textit{Unclassified}, \textit{Confidential}, \textit{Secret} and
+\textit{Top Secret}. Access is only granted if the subject has at least the same
+classification as the object. Access is denied if the subject has a lower
+classification than the object. The \emph{Bell-Lapadula-Model} is an
+implementation of this access control model:
+
+To define this model, consider a set of subjects $S$, a set of objects $O$ and
+the set of operations $A = \{\text{execute}, \text{read}, \text{append},
+\text{write}\}$. For two security levels $a, b \in SL$, there always exists a
+greatest lower bound $l \in SL: (l \leq a, l \leq b \text{ and } l
+\text{minimal})$ and a least upper bound $h$.
+
+The system is in a state at all times. A state is a triple $(b, M, f)$ with
+\begin{itemize}
+    \item $b \subseteq S \times O \times A$ the set of current accesses
+    \item $M = (M_{so})_{s\in S, o\in O}$ the current access matrix
+    \item $f = (f_s, f_c, f_o)$ with
+          \begin{itemize}
+              \item $f_s: S \mapsto SL$ the maximum clearance of each subject
+              \item $f_c: S \mapsto SL$ the current clearance of each subject
+                    (this requires $f_c(s) \leq f_s(s)$ for each subject $s$)
+              \item $f_o: O \mapsto SL$ the security classification of each
+                    object
+          \end{itemize}
+\end{itemize}
+
+The current clearance $f_c$ is chosen by each subject, within the limit set by
+the maximum clearance $f_s$.
+
+A state is secure, if the following properties are met:
+\begin{itemize}
+    \item \emph{Simple Security Property}: For all $(s, o, a) \in b$ with
+          $a=\text{read}$ or $a=\text{write}$: $f_o(o) \leq f_s(s)$ (Each
+          subject which is currently reading or writing has the necessary
+          maximum clearance)
+    \item \emph{*-Property}:
+          \begin{itemize}
+              \item For all $(s,o,a)\in b$ with $a=\text{append}$: $f_c(s) \leq
+                        f_o(o)$ \\ (No append operation is executed with higher
+                        clearance than the object)
+              \item For all $(s,o,a)\in b$ with $a=\text{write}$: $f_c(s) =
+                        f_o(o)$ \\ (Each write operation is executed with
+                        minimal clearance)
+              \item For all $(s,o,a)\in b$ with $a=\text{read}$: $f_c(s) \geq
+                        f_o(o)$ \\ (Each read operation is executed with a
+                        sufficient current clearance)
+          \end{itemize}
+          This property enforces the correct selection of the current clearance
+          $f_c$. Appending happens ``upwards'', writing on the same level, and
+          reading ``downwards''.
+    \item \emph{Discretionary Security Property}: For all $(s,o,a) \in b$: $A
+              \in M_{s,o}$
+\end{itemize}
