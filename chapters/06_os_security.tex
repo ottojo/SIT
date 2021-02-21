@@ -29,4 +29,44 @@ policy must only depend on the TCB, the rest of the operating system need not to
 be trusted.
 
 \section{Virtualization and Mandatory Access Control}
+\subsection{Virtualization}
+There exist many reasons to use virtualization, but the goal of virtualization
+from a security perspective is full isolation of systems and applications. The
+possibility to roll back an entire system to a known-good state in case of
+compromise also presents an advantage.
+
+Levels of virtualization are distinguished based on the role and position of the
+\emph{virtual machine monitor VMM}. In \emph{native virtualization}, the VMM
+directly interfaces with the hardware. In \emph{user mode virtualization}, the
+VMM only interfaces with the host OS, and not directly with the hardware. A
+hybrid approach is \emph{dual-mode virtualization}, where a host OS exists, but
+some form of direct access to the hardware by the VMM is possible.
+
+The interaction of the VMM with the \emph{guest OS} provides another way of
+categorization: In \emph{full virtualization}, the guest OS runs unmodified, as
+on real hardware. This is usually assisted by various hardware extensions such
+as \textit{AMD-V} and \textit{Intel VT-x}, special support by the MMU and
+passthrough of system busses such as PCI.
+
+\emph{Paravirtualization} refers to a mode of virtualization in which the guest
+OS is aware of the virtualization and has some adaptations to the host OS.
+Hardware drivers for example can be replaced with components that directly
+interface with the VMM.
+
+\subsection{Isolation}
+Isolation is the main benefit of virtualization from a security perspective.
+Errors in applications can be contained effectively, programs with different
+security requirements can be separated, and malware analysis is possible without
+effecting the host system. The host system can employ detailed monitoring, and
+perform effective intrusion detection from the outside. The isolation of common
+dependencies between applications prevents the compromise of multiple
+applications by compromise of the common dependency.
+
+As an example, a payment processor may be located in a dedicated VM with a
+secure operating system. The non-critical application such as a frontend which
+exposes a large attack surface runs in a separate VM and interfaces with the
+payment application only through a closely monitored interface.
+
+\subsection{Security Enhanced Linux}
+
 \section{Use-Case: iOS Security}
