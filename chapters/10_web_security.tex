@@ -140,6 +140,30 @@ Message Authentication Code, Encryption. Receiving works the same way in the
 opposite order. MAC and encryption use separate keys for both directions.
 
 \section{Injection Attacks}
+In injection attacks, some specially crafted input to the web application leads
+to unwanted effects.
+
 \subsection{Cross Site Scripting}
+Many web applications accept some kind of textual input, which then gets shown
+to a different user on the website, such as a forum- or social media post. If no
+special care is taken, this means that anyone can place arbitrary HTML,
+including scripts, on the website in the targets browser. This is referred to as
+\textit{Cross Site Scripting} or \emph{XSS}. A typical goal of such an attack is
+to steal cookies, which might allow the attacker to take over the login session
+of the target. Exfiltration of the cookie might happen via the query parameters
+of an image that gets loaded from the attackers server via the injected script.
+Protection against those kinds of attack include validating the input, and
+removing possibly dangerous characters, or making sure that user generated
+content is only interpreted as text by the browser, and not executed. Other
+measures include instructing the targets browser to not make any request to
+external servers, which hinders exfiltration.
+
 \subsection{SQL Injection}
-\section{Best Practices}
+User inputs such as login credentials are often used as parts of SQL queries. If
+the input contains valid SQL syntax, and is just appended to a query, it might
+change the query in a way such that it always returns a certain value to bypass
+authentication, or execute arbitrary statements with the privilege of the web
+server application. Even escaping the input data might not solve the issue, as
+second order injections might circumvent that. Again, it is important to ensure
+input data is only handled as text and no situation exists where it is
+potentially executed as code.
