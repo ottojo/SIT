@@ -1,0 +1,60 @@
+\chapter{Data Protection and Privacy}
+\section{Privacy Motivation}
+\todo[inline]{privacy motivation}
+
+\section{Privacy by Design and PETs}
+\subsection{Anonymous Communication: TOR}
+TOR implements a form of onion routing and a mix-network: A message for a server
+is encrypted with its public key. It is however not directly sent to this
+server, but through another server, which requires an additional layer of
+encryption for the intermediate server. (In practice, this asymmetric encryption
+may be replaced by a key exchange and symmetric encryption for the actual data,
+for performance reasons). This is repeated such that there are three
+intermediate \textit{onion routers} between the source and destination. This
+way, none of the routers sees both the source and destination: The first router
+knows about the source, the last router knows about the destination, the middle
+router does not know the source or destination.
+
+Attacks are possible by correlation of packets inside the network, incorrect
+usage of DNS or identification by the message payload.
+
+\subsection{Blind Signatures}
+A blind signature is needed when a document shall be signed without revealing it
+to the signing party. This works by first ``blinding'' the message, signing the
+blinded message, then unblinding the signed, blinded message. This results in a
+signed form of the original message.
+
+These kind of blind signatures are useful for electronic cash, which should
+provide anonymity, verifiable authenticity and protection against double
+spending. An analogy works as following: The user who wants to spend money puts
+an empty piece of paper with carbon paper in a sealed envelope. The bank signs
+that envelope on the outside, which makes the envelope with the paper inside
+worth 1\$. While signing the envelope, the signature was printed on the paper
+inside the envelope. This signed paper is now used as payment. The bank has
+however not seen the actual paper inside the envelope. Double spending is
+prevented by containing a serial number on the paper, which the merchant
+verifies with the bank before accepting payment.
+
+\subsection{Group Signatures}
+A group of users has a shared public key, but each user has an individual
+private key. A message should now be signed with a private key, and verification
+should be possible via the group public key. Group anonymity is provided since
+it is only confirmed during validation that a member of the group produced the
+signature, but not which exact member.
+
+A problem is that the group manager, who issues keys to the members, can spoof
+any participants identity and acts as a kind of trusted third party. The group
+manager might also be able to identify the individual member from a signature.
+
+\subsection{Attribute-Based Credentials}
+Using \emph{Attribute Authentication}, the user can provide proof of an
+attribute without revealing their own identity. Multiple authentications should
+not be linkable. Examples could include public transport tickets, where the
+owner should only be required to prove authorization to travel on the current
+route, without revealing identity or entire travel plans. ABCs can also
+implement pseudonymous or not-at-all-anonymous authentication.
+
+In an ABC scenario, the ABC authority first authorizes an issuer, and issues a
+device (smartcard) to the user. The issuer can then issue credentials containing
+attributes stored on the card. The card can then generate a selective proof
+revealing some attribute to a relying party.
