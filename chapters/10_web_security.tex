@@ -1,0 +1,145 @@
+\chapter{Web Security}
+All components of a web application, the browser, the web server and the
+underlying infrastructure are all subject to various attacks:
+
+The \emph{connection} is vulnerable to misuse of TCP/IP mechanisms, such as
+\textit{SYN flooding}. Eavesdropping and man-in-the-middle attacks are of
+concern to any network connection, and as such also for web applications.
+
+\emph{Web servers} or \emph{web applications} are often the target of an attack.
+Various techniques such as XSS, injections and authentication bypasses are
+explained later in this chapter.
+
+Attacks against the \emph{browser} exploit flaws in the renderer, engine,
+through scripting or plugins like java and flash.
+
+\section{Transport Layer Security}
+TLS presents a solution to secure TCP/IP connections. Its goals are to provide
+authentication, protection, and confidentiality: Servers are authenticated using
+X.509 certificates, clients can optionally authenticate the same way. The
+transferred data is encrypted. TLS is implemented on top of TCP/IP and provides
+an API very similar to normal TCP sockets.
+
+\subsection{Handshake Protocol}
+The TLS handshake protocol establishes a TLS session, including authentication,
+negotiation of cryptographic primitives and negotiation of a symmetric session
+key. One TLS session allows for multiple parallel TLS connections.
+
+\begin{figure}
+    \centering
+    \begin{tikzpicture}
+        \begin{umlseqdiag}
+            \umlactor[class=Client]{c}
+            \umlobject[class=Server]{s}
+            \begin{umlfragment}[type=1, inner xsep=2, name=1]
+                \begin{umlcall}[op={client hello}, dt=7]{c}{s}
+                \end{umlcall}
+                \begin{umlcall}[op={server hello}]{s}{c}
+                \end{umlcall}
+            \end{umlfragment}
+            \umlnote[x=7, y=-2]{1}{Negotiation of security parameters (``ciphersuite'')}
+
+
+            \begin{umlfragment}[type=2, inner xsep=2, name=2]
+                \begin{umlcall}[op=certificate,dt=7]{s}{c}
+                \end{umlcall}
+                \begin{umlcall}[type=return, op={server key exchange}]{s}{c}
+                \end{umlcall}
+                \begin{umlcall}[type=return, op={certificate request}]{s}{c}
+                \end{umlcall}
+                \begin{umlcall}[op={server done}]{s}{c}
+                \end{umlcall}
+            \end{umlfragment}
+            \umlnote[x=7, y=-4]{2}{Server authentication towards client}
+            \umlnote[x=7, y=-6]{2}{Optional: key exchange and request for client certificate}
+
+            \begin{umlfragment}[type=3, inner xsep=2, name=3]
+                \begin{umlcall}[type=return, op={certificate},dt=7]{c}{s}
+                \end{umlcall}
+                \begin{umlcall}[op={client key exchange}]{c}{s}
+                \end{umlcall}
+                \begin{umlcall}[type=return, op={certificate verify}]{c}{s}
+                \end{umlcall}
+            \end{umlfragment}
+            \umlnote[x=7, y=-8]{3}{Client key exchange}
+            \umlnote[x=7, y=-10]{3}{Optional: certificate-based client authentication}
+
+            \begin{umlfragment}[type=4, inner xsep=2, name=4]
+                \begin{umlcall}[op={change cipher spec},dt=7]{c}{s}
+                \end{umlcall}
+                \begin{umlcall}[op={finished}]{c}{s}
+                \end{umlcall}
+                \begin{umlcall}[op={change cipher spec}]{s}{c}
+                \end{umlcall}
+                \begin{umlcall}[op={finished}]{s}{c}
+                \end{umlcall}
+            \end{umlfragment}
+            \umlnote[x=7, y=-12]{4}{Switch to encryption}
+        \end{umlseqdiag}
+    \end{tikzpicture}
+    \caption{TLS Handshake Protocol}
+    \label{fig:tls_handshake}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \begin{tikzpicture}
+        \begin{umlseqdiag}
+            \umlactor[class=Client]{c}
+            \umlobject[class=Server]{s}
+                \begin{umlcall}[op={client hello}, dt=7]{c}{s}
+                    \begin{umlcall}[op={client random},dt=5]{c}{s}
+                    \end{umlcall}
+                    \begin{umlcall}[op={suggested cipher suites}]{c}{s}
+                    \end{umlcall}
+                    \begin{umlcall}[op={suggested compression}]{c}{s}
+                    \end{umlcall}
+                    \begin{umlcall}[op={session ID: 0x00}]{c}{s}
+                    \end{umlcall}
+                \end{umlcall}
+                \begin{umlcall}[op={server hello}]{s}{c}
+                    \begin{umlcall}[op={server random},dt=5]{s}{c}
+                    \end{umlcall}
+                    \begin{umlcall}[op={use cipher suites}]{s}{c}
+                    \end{umlcall}
+                    \begin{umlcall}[op={session ID}]{s}{c}
+                    \end{umlcall}
+                \end{umlcall}
+        \end{umlseqdiag}
+    \end{tikzpicture}
+    \caption{TLS Handshake Protocol: Hello messages (phase 1)}
+    \label{fig:tls_hello}
+\end{figure}
+
+\Cref{fig:tls_handshake} shows an overview of the TLS handshake: In \emph{phase
+1}, the client offers a list of supported cipher suites to the server. The
+server selects a cipher suite, and establishes a session ID. Random values for
+later key creation are also exchanged. \Cref{fig:tls_hello} shows phase 1 in
+detail.
+
+In \emph{phase 2}, the server sends its certificate, and optionally requests a
+client certificate for authentication of the client.
+
+In \emph{phase 3}, the client sends its certificate, if requested. The client
+has verified the server using the certificate, and can now use the severs public
+key for establishing a symmetric session key. The client generates a
+\texttt{PreMasterSecret}, from which client and server can derive the symmetric
+key using the random values exchanged in phase 1. The \texttt{PreMasterSecret}
+is RSA-encrypted using the servers public key and then sent to the server.
+
+In \emph{phase 4}, the symmetric session key is established. The integrity of
+the handshake is verified by exchanging hashes over the derived key and the
+previous messages. All following communication happens encrypted.
+
+\subsection{Record Protocol}
+Once the handshake is complete, the handshake protocol takes over and handles
+transfer of data. The record protocol is completely separate to the handshake
+protocol, making it theoretically possible to execute the handshake completely
+offline. The record protocol handles, in order: Fragmentation, Compression,
+Message Authentication Code, Encryption. Receiving works the same way in the
+opposite order. MAC and encryption use separate keys for both directions.
+
+\section{Injection Attacks}
+\subsection{Cross Site Scripting}
+\subsection{SQL Injection}
+\section{Best Practices}
