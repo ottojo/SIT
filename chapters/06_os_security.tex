@@ -68,5 +68,34 @@ exposes a large attack surface runs in a separate VM and interfaces with the
 payment application only through a closely monitored interface.
 
 \subsection{Security Enhanced Linux}
+Linux provides the \emph{Linux Security Module (LSM)} interface. Once a user
+triggers a security sensitive activity in the kernel through a syscall (for
+example: \texttt{read}), the LSM hook is executed, which the LSM module
+registers. The LSM module can then for example deny the filesystem access.
+\emph{SELinux} is such a module. SELinux supports a variety of mandatory access
+control schemes, the main one discussed here is \emph{type enforcement}. The
+idea is that both subjects and objects are assigned security labels. A central
+security policy determines which subjects can execute which operations on the
+objects based on the labels. The acting entity is always a process. Processes
+are assigned to \emph{domains}, for which access rules to objects are specified.
+SELinux supports two modes of handling processes without a specified domain:
+assigning all of those to a default \texttt{unconfined} domain or creating an
+individual domain for each process.
+
+Files are tagged with security \emph{labels}. The label my include a user identity,
+role, type or domain. The last field implements the type enforcement: for
+regular files, this expresses the type of the object, but for executables this
+determines the domain of the process once it is executed.
+
+Beyond the simple type enforcement, \emph{roles} can be defined. Users can have
+roles, and users can change the current role if they have sufficient privilege.
+Specific rights can then be given to specific roles.
+
+Multi-category and multi-level security is also implemented in SELinux,
+implementing the Bell-Lapadula model (see \cref{sec:belllapadula}).
+
+\subsection{AppArmor}
+\todo[inline]{AppArmor: describe example from video 6b}
 
 \section{Use-Case: iOS Security}
+\todo[inline]{iOS Security}
