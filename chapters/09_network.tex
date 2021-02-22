@@ -1,0 +1,132 @@
+\chapter{Network Security}
+\section{Information Gathering}
+The first step in attacking a networked environment is always to gather
+information on how the network is structured, and which connections, hosts and
+segments exist. It is important to know which services exist, as they might
+represent possible attack vectors. The next step is identifying vulnerabilities,
+and exploiting them. This often includes searching for systems with known
+vulnerabilities. What follows is often some measure to ensure permanent control,
+such as the installation of a rootkit or backdoor. This process may then be
+repeated to gain control to additional systems.
+
+\subsection{DNS}
+DNS exposes a lot of information about a network. Brute-forcing reverse DNS
+lookups for a targets IP range reveals domains or hostnames, which often reveal
+the purpose or service of a system.
+
+\subsection{whois}
+\texttt{whois} provides information about an IP range, specifically details
+about the organization and administrator responsible. Privacy regulations make
+it possible to vastly reduce the information visible nowadays.
+
+\subsection{traceroute}
+Network topology can be examined using \texttt{traceroute}. This tool uses ICMP
+packets with increasing TTL to find the address of each intermediate router
+between the source and a target address. Executing this from multiple hosts to
+multiple targets enables mapping the complete network.
+
+\subsection{SMTP}
+\subsection{Sniffing}
+Tools such as tcpdump or wireshark allow passive recording and decoding of
+network traffic. This allows direct retrieval of information transmitted in
+plaintext, and a lot of information even with encrypted communication through
+metadata.
+
+\subsection{Scanning}
+Active scanning of hosts and networks is possible through tools like
+\texttt{nmap}. The goal is usually to find out on which TCP or UDP ports there
+are applications listening.
+
+\paragraph{TCP connect scanning} simply tries to establish a TCP connection with
+the target. The typical packet sequence in a successful case would be
+\texttt{SYN}, \texttt{SYN/ACK}, \texttt{ACK}. If no application is listening,
+the sequence would be \texttt{SYN}, \texttt{RST/ACK}. This scanning technique is
+fast and easy to execute, even for non-superuser users. Disadvantages include
+that this only works for TCP, and is easy to detect even on application level.
+
+\paragraph{TCP \texttt{SYN} scanning} is an alternative where no complete TCP
+session is ever created. If the port is open and the target responds with
+\texttt{SYN/ACK}, the connection is immediately aborted with \texttt{RST}, not
+completing the three-way-handshake. This never creates a connection that the
+application receives, making it a lot more difficult to detect. This however
+also only works for TCP, and additionally requires superuser privileges to
+execute.
+
+\section{Attacks}
+The TCP/IP family of protocols was not designed with security as an objective.
+Various different attacks are possible:
+
+\subsection{Routing Attacks}
+Attacks on routing protocols can facilitate redirection of traffic through the
+attackers systems, or blackhole the traffic for a denial of service attack.
+Routing protocols currently in place are not very security focused, OSPF for
+example uses simple authentication using plaintext passwords and MD5 hashes,
+BGP4 relies on manual filters for incoming information.
+
+Inside a subnet, techniques such as ARP spoofing are possible, which allow
+redirection of traffic to the attackers machine just by responding to ARP
+queries for the corresponding IP address (or the gateway). DHCP replies can be
+forged in a similar way.
+
+\subsection{DNS Attacks}
+DNS attacks are of special importance since basically all internet communication
+relies on DNS during initialization of the connection. If the attacker controls
+the DNS server, they can redirect traffic intended for a specific domain to a
+malicious server. One method of attacking is \emph{DNS cache poisoning}:
+
+DNS makes use of a hierarchical architecture, and various levels of caching to
+ease load on the root and authoritative servers. The attacker targets such a
+caching server by triggering it to refresh the cache, for example by querying a
+targeted domain, and then immediately delivering a malicious response which then
+gets stored in the cache. While refreshing a cache entry, the server sends a
+request with a specific \texttt{query ID} to the upstream server. For a response
+to be accepted, the \texttt{query ID} has to match, but it is not verified in
+any other way if the reply indeed originates from an upstream server instead of
+a malicious attacker.
+
+The \texttt{query ID} is traditionally simply incremented each request, which
+means the attacker could easily guess it by querying the server for a domain, to
+which they own the authoritative name server, and assuming that the
+\texttt{query ID} for the to-be-poisoned request will be a subsequent number.
+The attacker will send multiple replies with different \texttt{query ID}s, with
+a high probability that one of them matches. If the reply arrives at the cache
+before the legitimate reply, the attack has succeeded.
+
+The challenges to the attacker are so far:
+\begin{itemize}
+    \item The entry must not be in the cache already
+    \item The correct \texttt{query ID} must be guessed
+    \item The response must arrive before the legitimate response
+\end{itemize}
+
+The most straightforward fix is to implement cryptographically secure random
+\texttt{query ID}s.
+
+It is however still possible to take over an entire nameserver/zone: The goal
+here is to corrupt the cache entry for the authoritative nameserver in the
+caching nameserver. Requests to the victim nameserver can be made for any
+non-existing subdomain the target nameserver is responsible for. In the forged
+response, a \texttt{NS} record is present containing the domain of the
+legitimate authoritative nameserver, but the accompanying \texttt{A} record
+points to a server the attacker controls. The ability to use arbitrary
+subdomains that will not be cached makes guessing the \texttt{query ID}
+feasible, combined with the fact that it is only 16bit long.
+
+Additional mitigations include using the port number of the request as an
+additional identifier, but this does only increase the effort in guessing, it
+does not solve the underlying problem. A long term solution is DNSSEC
+(\cref{sec:dnssec}).
+
+
+\subsection{Man in the Middle Attacks}
+
+\subsection{Denial of Service Attacks}
+
+\section{Security Mechanisms}
+
+\subsection{DNSSEC}
+\label{sec:dnssec}
+
+\subsection{Firewalls}
+
+\subsection{Intrusion Detection}
