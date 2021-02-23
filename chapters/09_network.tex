@@ -261,4 +261,44 @@ facilitates detailed logging and convenient to set-up filter rules. The gateway
 is however not transparent to the user, requires a separate proxy for each
 service or application and thus usually operates with lower performance.
 
+\subsubsection{Firewall Architectures}
+In addition to a simple packet filtering router, which may be implemented by a
+dual homed host, firewall architectures often include a \emph{demilitarized zone
+(DMZ)}. This is a special area within the firewall, which contains servers that
+need to be accessible from the internet. An architecture with an application
+gateway places the gateway in the DMZ. Incoming and outgoing traffic passes
+through the screening router, which redirects it through the application
+gateway. 
+
+Multiple routers may be placed in the DMZ, usually an exterior router
+between the internet and the DMZ, and an interior router between the DMZ and the
+LAN. This makes the DMZ a \textit{screened subnet}. Separating the routers
+provides multiple advantages, for example increased resistance towards DOS from
+the internet (interior router not affected).
+
+Multiple such levels of screening are possible, for example with dedicated zones
+for servers requiring external access, and for servers that are only accessible
+from the internal LAN, with an intermediate router in between.
+
+\subsubsection{IP Tables}
+\texttt{iptables} is a software packet filter in linux. It contains multiple set
+of rules depending on the path a packet takes.
+
+Ingress is always controlled by the rules for the \textit{prerouting} chain,
+egressing packets pass through the \textit{postrouting} chain.
+
+Packets destined for a local process, or originating process go through the
+\textit{input} and \textit{output} chains, packets that pass through the system
+are handled by the \textit{forward} chain.
+
+For each chain, the behavior is configured using the tables \textit{filter},
+\textit{nat} (Network Address Translation) and \textit{mangle} (modification of
+packets). \textit{Nat} is not relevant for \textit{input} and \textit{forward},
+\textit{filter} is not relevant for \textit{pre-} and \textit{postrouting}.
+
+Each rule in a table contain a \textit{match} parameter specifying which packet
+it applies to, and an action to be taken for matching packets. Matching rules
+can have many criteria, including data quotas, rate limiting, and to tome extent
+deep packet inspection.
+
 \subsection{Intrusion Detection}
