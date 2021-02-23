@@ -1,0 +1,71 @@
+\chapter{Software Security}
+Development of secure software impacts all areas of software development. Before
+implementation, analysis of requirements includes identifying threats, risk and
+potential damages. The system design shall adhere to principles such as defense
+in depth, reduced complexity and the principle of least privilege. Features such
+as authorization and authentication as well as secure data  storage have to be
+considered during the design phase, and are often much more difficult to add at
+a later stage.
+
+The implementation should make use of coding standards and best practices to
+avoid common errors. The programming language, compiler, IDE or analysis tools
+can help with those tasks.
+
+Various forms of testing and verification are vital to ensure the software
+performs as expected, which is absolutely necessary in order to even consider
+the security of the system. A special case of testing, \textit{fuzzing}, is
+explained in more detail in \cref{sec:fuzzing}.
+
+\section{Software Development}
+The goal during development of secure software is to prevent vulnerabilities in
+the program. A vulnerability is a particularly severe security flaw. Flaws in
+software can be categorized:
+\begin{itemize}
+    \item \emph{Errors} are mistakes a developer makes during design or
+          implementation.
+    \item \emph{Faults or Bugs} are errors in the code.
+    \item A \emph{Failure} is a deviation of a program from the specified or
+          intended behavior.
+\end{itemize}
+
+\paragraph{Functional testing} is used to look for failures, with the goal to
+avoid faults and bugs which can cause the program to fail during normal
+operation.
+
+\paragraph{Security testing} searches for faults and bugs that lead to security
+vulnerabilities. Those bugs often don't result in a failure during normal use,
+but may be exploited by an attacker.
+
+The most typical software flaws include improper handling of user input and
+out-of-bounds memory accesses.
+
+Some software is particularly critical. This includes all software that is
+exposed to external entities, by interacting with the network or accepting input
+from the user. Software that runs with high privileges is critical in so far
+that a compromise could easily lead to compromise of the entire system.
+Similarly, software in which a failure has critical consequences such as
+software handling confident data or critical infrastructure needs to be
+especially protected.
+
+Multiple crucial design principles can be identified:
+\begin{itemize}
+    \item \emph{Segmentation} ensures that in case of inevitable eventual
+          compromise, a breach is contained to a specified part of the system.
+    \item The \emph{least privilege} principle states that each system shall
+          have the least required amount of privileges, in order to defend
+          against easy privilege escalation.
+    \item \emph{Defense in depth} refers to the type of segmentation, in that a
+          architecture consisting of multiple layers of abstraction is easier to
+          protect.
+    \item The \emph{low complexity} principle refers to the fact that the
+          simpler a system is organized, the easier it is to find errors and
+          spot design mistakes.
+\end{itemize}
+
+\section{Fuzzing}
+\label{sec:fuzzing}
+Fuzzing is a way of automated testing of software that accepts some kind of
+input. It consists of brute-forcing different input values and combinations
+until the program crashes or some fault is detected. This enables finding
+edge-cases which are not handled in the program and might lead to a
+vulnerability.
