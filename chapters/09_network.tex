@@ -119,10 +119,62 @@ does not solve the underlying problem. A long term solution is DNSSEC
 
 
 \subsection{Man in the Middle Attacks}
+The objective of a man-in-the-middle attack is to infiltrate an existing or new
+connection. Both endpoints think they communicate with each other, when they are
+actually both communicating with the attacker. The attacker can then both record
+and modify the traffic, and this can even work with encrypted connections. If
+the attacker spoofs the IP of a target web server for example, the client
+establishes a TLS connection, and the real web server receives an incoming TLS
+connection, but both connections are separate and are terminated at the
+attacker. A mitigation is exchanging certificates while the connection is
+established. The certificate is signed (transitively) by a root CA, which has a
+public key that is known to the client in advance, usually by distribution with
+the operating system or browser. The user can then be warned if the server did
+not send a certificate, or sent a certificate that is not signed by a known CA.
 
 \subsection{Denial of Service Attacks}
+A wide variety of DOS attacks exist at every level of a system. All those have
+one goal in common: to deplete some resource of the system, making it
+unavailable.
+
+In network settings, DDOS, \textit{distributed} denial of service, is often
+considered. Here, the attacker makes use of a large number of hosts, via a
+botnet for example, to overwhelm the target with traffic from many sources. This
+makes this type of attack possible even if every attacking system is a lot less
+powerful than the target. Those attacks usually target the network connection or
+server resources (CPU, memory, etc) of the victim.
+
+Multiple types of network DOS attacks exist, but one example is \emph{SYN
+    flooding}: The client sends a massive number of TCP \texttt{SYN} packets to
+    the target, but never answers with \texttt{ACK}, establishing a connection.
+    This results in the server saving a status for each half-established
+    connection, which starves its resources.
+
+Protection against SYN flooding is provided by \emph{SYN cookies}: It avoids
+saving state when a \texttt{SYN} packet arrives. This is done by using the
+sequence number in the TCP packet, which gets incremented whenever a packet is
+sent. One does not however has to start at 1 or increment by 1. The server
+inserts a value into the sequence number of the \texttt{SYN/ACK} which can be
+used later to recognize that packet. This is generated using a hash function
+that takes information like the current time, the host IP and port as well as a
+server secret as input. The client is expected to increment this by 1 when
+returning the ACK. When the server receives it, it can ``decrypt'' or
+reconstruct the value to verify that the client has sent a \texttt{SYN} before.
+
+General protection measures against DOS attacks include special hardware
+appliances which monitor the traffic and protect against unusual amounts of
+traffic, overprovisioning of servers and use of scalable cloud resources and
+CDNs.
+
+Difficult to protect against are \emph{low-and-slow} attacks, which try to slow
+down a server by sending specially crafted packets which are known to trigger
+slow or performance intensive operations on the target.
 
 \section{Security Mechanisms}
+
+In addition to the aforementioned protective measures against specific attacks,
+this section goes into detail on DNSSEC, and the more general topics of
+firewalls and intrusion detection.
 
 \subsection{DNSSEC}
 \label{sec:dnssec}
@@ -134,6 +186,79 @@ signing key}, which is signed using the servers \emph{key signing key}. A hash
 of the KSK is available at the parent zones nameserver, making it possible to
 verify the identity of the server up to the root zone.
 
+Solutions such as DoT and DoH introduce TLS and HTTPS as transports for DNS,
+with the goal of privacy. It is however questionable how useful such measures
+are, as they only delegate the problem to the operator of the DNS server.
+
 \subsection{Firewalls}
+Firewalls reduce the attack surface of a network by reducing its exposure to the
+internet as a whole. A firewall is a network component which separates multiple
+network segments from each other. Traffic between the networks is controlled
+according to a security policy.
+
+Firewalls often filter packets, which is done on multiple levels:
+\begin{itemize}
+    \item Virus-/Java-/ActiveX filter for email and HTTP: This provides a
+          similar approach as local antivirus software may take, but at a
+          centralized location. Those filters can however be easily
+          circumvented, using encryption or even just unusual compression
+          methods.
+    \item Content filters, which scan for specific addresses or keywords
+    \item Anti-Spoofing filters which remove packets with forged addresses (such
+          as IP spoofing)
+\end{itemize}
+
+A firewall can however perform a lot of additional functions:
+\begin{itemize}
+    \item Logging
+    \item Authentication
+    \item Enforcement of data protection
+    \item Network Address Translation
+\end{itemize}
+
+All those functions and requirements indicate that the firewall is closely
+related and integrated with routers, gateways on multiple levels, logging
+facilities and services providing authentication and security policies.
+
+\subsubsection{Security policies}
+An important decision in firewall configuration is the \emph{base policy}. It
+specifies how traffic is handled, for which no more specific rule exists.
+
+\emph{Default-Deny} specifies that access is usually prohibited unless it is
+explicitly allowed. The list of allowed services is provided by the
+administrator. This makes deployment of new services difficult, and may
+frustrate users since a lot of services are not available.
+
+The alternative is \emph{Default-Allow}, where access is usually permitted
+unless explicitly prohibited. This has the disadvantage from a security
+perspective that all potentially dangerous services have to be blocked, which is
+usually not known in advance.
+
+\subsubsection{Filtering}
+Network level filtering can be done on layer 3 or layer 4: Layer 3 filtering
+works on IP datagrams and is based on the source and destination addresses.
+Layer 4 filtering can additionally take the port number and direction of
+connection (in case of TCP) into account.
+
+Application level filtering is sometimes referred to as \emph{deep packet
+inspection}, and can make protocol specific decisions such as allowing only
+certain HTTP methods or URLs, or block emails to a specific domain even when
+being transmitted to a common mail server.
+
+Packet filters are usually fully transparent and as such independent from the
+user, and can be implemented highly performant. Disadvantages include poor
+logging capabilities, difficult to set-up rules, and difficult to filter
+protocols which may require stateful inspection, and usually no interpretation
+of streamed data.
+
+\subsubsection{Application Gateways / Proxies}
+Gateways or proxy servers prohibit direct transfer of data via lower levels, but
+require a proxy for each application protocol, which implements that protocol
+and inspects the data, before forwarding it. This automatically realizes the
+default-deny policy. It also makes it possible to authenticate the user, handle
+user sessions and interpret data streams. The application specific nature
+facilitates detailed logging and convenient to set-up filter rules. The gateway
+is however not transparent to the user, requires a separate proxy for each
+service or application and thus usually operates with lower performance.
 
 \subsection{Intrusion Detection}
