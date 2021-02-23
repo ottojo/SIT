@@ -145,10 +145,10 @@ powerful than the target. Those attacks usually target the network connection or
 server resources (CPU, memory, etc) of the victim.
 
 Multiple types of network DOS attacks exist, but one example is \emph{SYN
-    flooding}: The client sends a massive number of TCP \texttt{SYN} packets to
-    the target, but never answers with \texttt{ACK}, establishing a connection.
-    This results in the server saving a status for each half-established
-    connection, which starves its resources.
+flooding}: The client sends a massive number of TCP \texttt{SYN} packets to the
+target, but never answers with \texttt{ACK}, establishing a connection. This
+results in the server saving a status for each half-established connection,
+which starves its resources.
 
 Protection against SYN flooding is provided by \emph{SYN cookies}: It avoids
 saving state when a \texttt{SYN} packet arrives. This is done by using the
@@ -268,13 +268,13 @@ dual homed host, firewall architectures often include a \emph{demilitarized zone
 need to be accessible from the internet. An architecture with an application
 gateway places the gateway in the DMZ. Incoming and outgoing traffic passes
 through the screening router, which redirects it through the application
-gateway. 
+gateway.
 
-Multiple routers may be placed in the DMZ, usually an exterior router
-between the internet and the DMZ, and an interior router between the DMZ and the
-LAN. This makes the DMZ a \textit{screened subnet}. Separating the routers
-provides multiple advantages, for example increased resistance towards DOS from
-the internet (interior router not affected).
+Multiple routers may be placed in the DMZ, usually an exterior router between
+the internet and the DMZ, and an interior router between the DMZ and the LAN.
+This makes the DMZ a \textit{screened subnet}. Separating the routers provides
+multiple advantages, for example increased resistance towards DOS from the
+internet (interior router not affected).
 
 Multiple such levels of screening are possible, for example with dedicated zones
 for servers requiring external access, and for servers that are only accessible
@@ -302,3 +302,41 @@ can have many criteria, including data quotas, rate limiting, and to tome extent
 deep packet inspection.
 
 \subsection{Intrusion Detection}
+The objective of intrusion detection systems is to detect an ongoing attack on a
+computer or network. Distinction can by made by place of installation or by type
+of detection.
+
+Distinction by place of installation:
+\begin{itemize}
+    \item Host based: Installed on monitored system, evaluates information from
+          the operating system, and detects attacks only on this specific
+          system.
+    \item Network based: The system connects to the network at one or multiple
+          (central) points and evaluated the network traffic. It detects attacks
+          against the network and hosts within the network.
+\end{itemize}
+Hybrid approaches of Host-IDS (HIDS) and Network-IDS (NIDS) are possible.
+
+Distinction by type of detection:
+\begin{itemize}
+    \item Signature based:
+          \begin{itemize}
+              \item Detects predefined attack signatures
+              \item Low number of false positive detections
+              \item No detection of previously unknown attacks
+          \end{itemize}
+    \item Anomaly based:
+          \begin{itemize}
+              \item Detects anomalous behavior after a training phase
+              \item Can detect previously unknown attacks
+              \item Attacks might go undetected, if they don't show an anomaly
+          \end{itemize}
+    \item Specification based:
+          \begin{itemize}
+              \item Detects deviation from specified behavior or protocol
+                    specification (RFC etc)
+              \item Recognizes correct behavior accurately
+              \item Requires full specification of system
+              \item Attacks might comply to specification
+          \end{itemize}
+\end{itemize}
