@@ -126,6 +126,13 @@ does not solve the underlying problem. A long term solution is DNSSEC
 
 \subsection{DNSSEC}
 \label{sec:dnssec}
+The basic idea of DNSSEC is that the authoritative servers sign the records
+using asymmetric cryptography. The caching resolvers can then verify the
+signatures. The required key-hierarchy lends itself to the hierarchical model
+which is already in place with DNS. A server signs its records with a \emph{zone
+signing key}, which is signed using the servers \emph{key signing key}. A hash
+of the KSK is available at the parent zones nameserver, making it possible to
+verify the identity of the server up to the root zone.
 
 \subsection{Firewalls}
 
