@@ -13,9 +13,9 @@ In order to identify an entity, an \emph{identifier} has to be defined. The
 identifier should meet the above criteria and should be able to determine an
 identity \textit{within a given context}.
 
-Identifiers have the purpose of both accountability and access control. They
-can be applied to both subjects (users, processes, ...) and objects (files,
-URLs, ...), humans and machines, and can be temporary or persistent.
+Identifiers have the purpose of both accountability and access control. They can
+be applied to both subjects (users, processes, ...) and objects (files, URLs,
+...), humans and machines, and can be temporary or persistent.
 
 For authentication, a separate \textit{proof of identity} is usually required:
 
@@ -61,10 +61,10 @@ Biometric authentication systems can fail in two ways: \emph{False negative}
 means that a user is incorrectly rejected, a \emph{false positive} means that a
 user is wrongly accepted. The threshold on accepting a authentication attempt
 has to be chosen in a application specific way, depending on which fault is more
-acceptable. \Cref{fig:eer} shows the relationship between the
-\textit{False Acceptance Rate} and \textit{False Rejection Rate} with a varying
-threshold. A measure of the security of the authentication system could be the
-\textit{Equal Error Rate}.
+acceptable. \Cref{fig:eer} shows the relationship between the \textit{False
+Acceptance Rate} and \textit{False Rejection Rate} with a varying threshold. A
+measure of the security of the authentication system could be the \textit{Equal
+Error Rate}.
 \begin{figure}
     \centering
     \begin{tikzpicture}
@@ -159,4 +159,116 @@ is introduced. So even if a state is already present in a different chain (but
 at another round in the chain), the original chain continues separately.
 
 \section{Network Authentication}
-\todo[inline]{Authentication: Network Authentication}
+The challenge of network authentication is that the communication has to be
+established over an insecure channel. Passwords shall not be transmitted as
+plaintext, but in encrypted form. Thus the problem quickly changes from
+authentication to a key-distribution problem.
+
+\subsection{Kerberos}
+Kerberos is a network authentication protocol using symmetric cryptography. It
+is best explained using an example:
+
+Each organization has one authentication server, also called key distribution
+center, and a ticket granting server TGS. The TGS hands out the authorization to
+clients to use a certain service. This is done using tickets. A ticket for a
+client to access a service includes a specific session key, the identity of the
+client and a validity period. The ticket is encrypted using a key that only the
+TGS and the service know. The client can not decrypt the ticket.
+
+If a client $A$ wants to access a service $B$, $A$ first contacts the
+authentication server. The server then provides $A$ with a session key between
+$A$ and the TGS (encrypted using $A$s password), and a ticket for the TGS which
+can provide TGS with the session key to talk to $A$.
+
+The TGS can now provide $A$ with a session key between $A$ and $B$, and a ticket
+for $B$ that provides $B$ with the session key.
+
+Now $A$ and $B$ have a shared session key, and they can communicate.
+
+Criticism of kerberos include the centrally controlled servers, and reliance on
+synchronized clocks for timestamps. Session keys are known to the servers, not
+only to the client and service. Also, the first message is not authenticated,
+opening multiple attack vectors.
+
+\subsection{Station to Station}
+It has already been established that Diffie-Hellman is susceptible to
+man-in-the-middle attacks (\cref{sec:diffiehellman}). A solution is to
+authenticate the public keys $A$ and $B$ using digital signatures.
+
+The station to station protocol now requires verification of signatures after
+exchanging the public values $A$ and $B$: Bob signs both $A$ and $B$ with his
+private signing key, Alice signs both $A$ and $B$ using her private signing key.
+The signatures are encrypted using the shared secret key. Verification of the
+signature now assures each party that no man in the middle who is exchanging the
+keys is present.
+
+This assumes however that the public signature verification keys are already
+known.
+
+\subsection{Perfect Forward Secrecy}
+Perfect forward secrecy is given when the compromise of a long term secret such
+as secret keys does not compromise the security of short term secrets used in
+the past.
+
+\subsection{Certificates}
+A digital certificate links some public key to a person. The certificates
+generally includes the public key, some identifier and a validity period. All
+this is signed by the signature generation key of a trusted third party
+(certification authority CA). This certificate can then be verified if the
+verification key of the CA is known.
+
+The \emph{certification authorities} play an important role in the \emph{public
+key infrastructure}. Usually a number of CAs exist, which all operate under some
+root CA. The root CA signs the public keys of the other CAs and such verifies
+the validity of the CA. Those CAs can then sign public keys of users, after
+verifying their identity.
+
+The public key of the root CA has to be transmitted using a secure channel. This
+is usually done by distribution via operating systems and browsers.
+
+\subsubsection{X.509 Certificates}
+X.509 is a standard for digital certificates. It specifies that the identifier
+is in the hierarchical \textit{distinguished name (DN)} naming format. It also
+specifies the fields in the certificate:
+\begin{itemize}
+    \item Version
+    \item Serial number
+    \item Signature algorithm
+    \item Issuers DN
+    \item Validity interval
+    \item Subjects DN
+    \item Subjects public key
+    \item Issuers unique identifier
+    \item Subjects unique identifier
+    \item Extensions
+    \item Signature
+\end{itemize}
+Extensions can for example control the key usage (signing emails, TLS web
+server, etc).
+
+PKIs have several problems, which become evident if a CA gets compromised. This
+allows the attacker to for example issue certificates for any domain. The number
+of CAs commonly in use is large, and many use weak security.
+
+\subsection{PGP}
+Pretty Good Privacy PGP provides an alternative approach to trust in a
+decentralized fashion. It relies on the concept of users singing each others
+keys. Each user has a keyring of public keys and signatures on them. If a user
+receives a public key which is signed by many users they trust, they might also
+trust the new public key.
+
+There are different notions of trust: \emph{Owner trust} is the value of trust
+someone assigns to a key in the keyring. Completely trusting a key implies also
+trusting the other keys signed by this key.
+
+\emph{Calculated trust} answers the question of whether to trust a public key
+that was used. A chain of signatures is required, starting with some public key
+in the keyring and ending with the key in question.
+
+\emph{Key legitimacy} is calculated as
+\begin{equation}
+    L = \frac{x}{X}+\frac{y}{Y}
+\end{equation}
+with $x$ being the number of signatures with ``marginal'' trust, $y$ the number
+of signatures with ``complete'' trust and $X$ and $Y$ the required corresponding
+number of signatures.
