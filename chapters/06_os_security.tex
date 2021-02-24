@@ -8,6 +8,10 @@ and processes. Raw hardware access is usually restricted, and only allowed to
 privileged code within the operating system. Protection against external access
 may also be part of host security.
 
+A core problem of host security is the \emph{confinement problem}: The problem
+of preventing a server from leaking information that the user of the service
+considers confidential.
+
 \section{Concepts and Reference Monitors}
 A \emph{reference monitor} is an abstract machine which mediates all accesses to
 objects by subjects (see \cref{chapter:access_control}). Reference monitors can
